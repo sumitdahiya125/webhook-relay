@@ -1,0 +1,15 @@
+services:
+  webhook-relay:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      WHR_SIGNING_SECRET: "dev-secret"
+      WHR_DATABASE_URL: "sqlite:////data/webhook_relay.db"
+    volumes:
+      - relay-data:/data
+
+volumes:
+  relay-data:
