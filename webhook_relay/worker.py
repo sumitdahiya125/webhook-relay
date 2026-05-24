@@ -46,9 +46,7 @@ async def tick(storage: Storage, settings: Settings, *, http_send: HttpSendFn | 
         ok, status, body_snippet, error, dur_ms = await deliver_one(
             event, str(endpoint.url), settings, http_send=http_send
         )
-        await storage.record_attempt(
-            event.id, now_utc(), status, body_snippet, error, dur_ms
-        )
+        await storage.record_attempt(event.id, now_utc(), status, body_snippet, error, dur_ms)
 
         if ok:
             await storage.mark_succeeded(event.id, now_utc())

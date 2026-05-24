@@ -63,9 +63,7 @@ def test_enqueue_unknown_endpoint_400(client: TestClient) -> None:
 
 
 def test_stats(client: TestClient) -> None:
-    client.post(
-        "/endpoints", json={"id": "ep-stats", "url": "https://example.test/x"}
-    )
+    client.post("/endpoints", json={"id": "ep-stats", "url": "https://example.test/x"})
     client.post(
         "/events",
         json={"endpoint_id": "ep-stats", "event_type": "x", "payload": {}},

@@ -5,8 +5,8 @@ from __future__ import annotations
 import json
 import random
 import time
-from datetime import datetime, timedelta, timezone
-from typing import Awaitable, Callable
+from collections.abc import Awaitable, Callable
+from datetime import UTC, datetime, timedelta
 
 import httpx
 
@@ -90,4 +90,4 @@ async def deliver_one(
 
 
 def now_utc() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)

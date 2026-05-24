@@ -14,7 +14,7 @@ def main() -> None:
         level=logging.INFO,
         format="%(asctime)s %(levelname)-7s %(name)s %(message)s",
     )
-    settings = Settings()
+    Settings()
     uvicorn.run(
         "webhook_relay.api:create_app",
         factory=True,

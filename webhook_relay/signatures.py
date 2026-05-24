@@ -20,7 +20,9 @@ class SignedPayload:
     header_value: str  # the full string to put in X-Webhook-Signature
 
 
-def sign(body: bytes, secret: str, algorithm: str = "sha256", ts: int | None = None) -> SignedPayload:
+def sign(
+    body: bytes, secret: str, algorithm: str = "sha256", ts: int | None = None
+) -> SignedPayload:
     """Compute an HMAC signature.
 
     The signed string is ``f"{timestamp}.{body.decode('utf-8', 'surrogateescape')}"``
@@ -31,7 +33,7 @@ def sign(body: bytes, secret: str, algorithm: str = "sha256", ts: int | None = N
         raise ValueError(f"unsupported algorithm: {algorithm}")
     if ts is None:
         ts = int(time.time())
-    signed_str = f"{ts}.".encode("utf-8") + body
+    signed_str = f"{ts}.".encode() + body
     digest = hmac.new(secret.encode("utf-8"), signed_str, getattr(hashlib, algorithm)).hexdigest()
     sig = f"{algorithm}={digest}"
     return SignedPayload(body=body, timestamp=ts, signature=digest, header_value=sig)
@@ -67,7 +69,7 @@ def verify(
     if algo not in {"sha256", "sha512"}:
         return False, f"unsupported algorithm: {algo}"
 
-    signed_str = f"{ts}.".encode("utf-8") + body
+    signed_str = f"{ts}.".encode() + body
     expected = hmac.new(secret.encode("utf-8"), signed_str, getattr(hashlib, algo)).hexdigest()
     if not hmac.compare_digest(expected, hexsig.strip()):
         return False, "signature mismatch"

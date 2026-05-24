@@ -6,8 +6,8 @@ import httpx
 import pytest
 
 from webhook_relay.config import Settings
-from webhook_relay.delivery import backoff_seconds, should_retry, now_utc
-from webhook_relay.models import Endpoint, DeliveryStatus
+from webhook_relay.delivery import backoff_seconds, now_utc, should_retry
+from webhook_relay.models import DeliveryStatus, Endpoint
 from webhook_relay.storage import Storage
 from webhook_relay.worker import tick
 
@@ -66,9 +66,7 @@ def _send_factory(responses: list):
 
 @pytest.mark.asyncio
 async def test_successful_delivery(storage: Storage, settings: Settings) -> None:
-    await storage.upsert_endpoint(
-        Endpoint(id="ep1", url="https://example.test/hook")
-    )
+    await storage.upsert_endpoint(Endpoint(id="ep1", url="https://example.test/hook"))
     event = await storage.enqueue("ep1", "order.created", {"x": 1}, now=now_utc())
     send = _send_factory([200])
     processed = await tick(storage, settings, http_send=send)
@@ -79,9 +77,7 @@ async def test_successful_delivery(storage: Storage, settings: Settings) -> None
 
 @pytest.mark.asyncio
 async def test_retry_then_succeed(storage: Storage, settings: Settings) -> None:
-    await storage.upsert_endpoint(
-        Endpoint(id="ep1", url="https://example.test/hook")
-    )
+    await storage.upsert_endpoint(Endpoint(id="ep1", url="https://example.test/hook"))
     event = await storage.enqueue("ep1", "order.created", {"x": 1}, now=now_utc())
 
     # First two attempts return 500, third returns 200.
@@ -105,9 +101,7 @@ async def test_retry_then_succeed(storage: Storage, settings: Settings) -> None:
 
 @pytest.mark.asyncio
 async def test_dead_letter_after_max_attempts(storage: Storage, settings: Settings) -> None:
-    await storage.upsert_endpoint(
-        Endpoint(id="ep1", url="https://example.test/hook")
-    )
+    await storage.upsert_endpoint(Endpoint(id="ep1", url="https://example.test/hook"))
     event = await storage.enqueue("ep1", "order.created", {"x": 1}, now=now_utc())
 
     send = _send_factory([500] * 10)  # always fail
@@ -126,9 +120,7 @@ async def test_dead_letter_after_max_attempts(storage: Storage, settings: Settin
 
 @pytest.mark.asyncio
 async def test_4xx_skips_retries(storage: Storage, settings: Settings) -> None:
-    await storage.upsert_endpoint(
-        Endpoint(id="ep1", url="https://example.test/hook")
-    )
+    await storage.upsert_endpoint(Endpoint(id="ep1", url="https://example.test/hook"))
     event = await storage.enqueue("ep1", "order.created", {"x": 1}, now=now_utc())
     send = _send_factory([404])
     await tick(storage, settings, http_send=send)
@@ -139,9 +131,7 @@ async def test_4xx_skips_retries(storage: Storage, settings: Settings) -> None:
 
 @pytest.mark.asyncio
 async def test_replay_resets_status(storage: Storage, settings: Settings) -> None:
-    await storage.upsert_endpoint(
-        Endpoint(id="ep1", url="https://example.test/hook")
-    )
+    await storage.upsert_endpoint(Endpoint(id="ep1", url="https://example.test/hook"))
     event = await storage.enqueue("ep1", "order.created", {"x": 1}, now=now_utc())
     send = _send_factory([404])
     await tick(storage, settings, http_send=send)
@@ -157,9 +147,7 @@ async def test_replay_resets_status(storage: Storage, settings: Settings) -> Non
 
 @pytest.mark.asyncio
 async def test_attempts_log_written(storage: Storage, settings: Settings) -> None:
-    await storage.upsert_endpoint(
-        Endpoint(id="ep1", url="https://example.test/hook")
-    )
+    await storage.upsert_endpoint(Endpoint(id="ep1", url="https://example.test/hook"))
     event = await storage.enqueue("ep1", "order.created", {"x": 1}, now=now_utc())
     send = _send_factory([200])
     await tick(storage, settings, http_send=send)

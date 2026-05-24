@@ -8,9 +8,9 @@ from __future__ import annotations
 
 import json
 import uuid
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
-from typing import AsyncIterator
+from datetime import UTC, datetime
 
 import aiosqlite
 
@@ -59,7 +59,7 @@ CREATE INDEX IF NOT EXISTS idx_attempts_event ON attempts (event_id);
 
 
 def _iso(dt: datetime) -> str:
-    return dt.astimezone(timezone.utc).isoformat()
+    return dt.astimezone(UTC).isoformat()
 
 
 def _parse_iso(s: str) -> datetime:
@@ -313,9 +313,7 @@ class Storage:
 
     async def stats(self) -> dict[str, int]:
         async with self._conn() as db:
-            cur = await db.execute(
-                "SELECT status, COUNT(*) AS n FROM events GROUP BY status"
-            )
+            cur = await db.execute("SELECT status, COUNT(*) AS n FROM events GROUP BY status")
             result = {s.value: 0 for s in DeliveryStatus}
             async for row in cur:
                 result[row["status"]] = row["n"]

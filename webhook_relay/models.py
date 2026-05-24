@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from enum import Enum
+from datetime import UTC, datetime
+from enum import StrEnum
 
 from pydantic import BaseModel, Field, HttpUrl
 
 
-class DeliveryStatus(str, Enum):
+class DeliveryStatus(StrEnum):
     PENDING = "pending"
     IN_FLIGHT = "in_flight"
     SUCCEEDED = "succeeded"
@@ -45,7 +45,7 @@ class Endpoint(BaseModel):
     url: HttpUrl
     description: str | None = None
     active: bool = True
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 # ----- request/response DTOs ------------------------------------------------
